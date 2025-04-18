@@ -91,7 +91,7 @@ export interface State {
   setSelectedResearchId: (id: number | null) => void;
 
   // Quiz methods
-  getQuiz: (id: number) => Quiz | undefined;
+  getQuiz: (id: number) => Quiz | null;
   getQuizzesByTopicId: (topicId: number) => Quiz[];
   addQuiz: (
     quiz: Omit<Quiz, "id" | "createdAt" | "updatedAt" | "questions">,
@@ -208,7 +208,7 @@ const store: StateCreator<State> = persist(
     },
 
     // Quiz methods
-    getQuiz: (id) => get().quizzes.find((q) => q.id === id),
+    getQuiz: (id) => get().quizzes.find((q) => q.id === id) ?? null,
     getQuizzesByTopicId: (topicId) =>
       get().quizzes.filter((q) => q.topicId === topicId),
     addQuiz: (quiz) => {

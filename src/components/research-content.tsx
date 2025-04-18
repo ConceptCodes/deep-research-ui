@@ -8,14 +8,19 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Markdown from "@/components/markdown";
 import { EventLog } from "@/components/event-log";
+import { useState } from "react";
 
-import type { Research } from "@/hooks/use-store";
+import useStore, { type Quiz, type Research } from "@/hooks/use-store";
+import { Button } from "./ui/button";
 
 interface ResearchContentProps {
   project: Research;
 }
 
 export function ResearchContent({ project }: ResearchContentProps) {
+  const { getQuiz } = useStore();
+  const [quiz, setQuiz] = useState<Quiz | null>(getQuiz(project.id));
+
   return project.status !== "completed" ? (
     <EventLog projectId={project.id} />
   ) : (
@@ -25,8 +30,8 @@ export function ResearchContent({ project }: ResearchContentProps) {
         <TabsTrigger value="sources" disabled={project.status !== "completed"}>
           Sources
         </TabsTrigger>
-        {/* <TabsTrigger value="quiz">Quiz</TabsTrigger> */}
-        {/* <TabsTrigger value="flash-cards">Flash Cards</TabsTrigger> */}
+        <TabsTrigger value="quiz">Quiz</TabsTrigger>
+        <TabsTrigger value="flash-cards">Flash Cards</TabsTrigger>
       </TabsList>
 
       <TabsContent value="summary" className="mt-4">
@@ -80,9 +85,11 @@ export function ResearchContent({ project }: ResearchContentProps) {
         </Card>
       </TabsContent>
 
-      {/* <TabsContent value="quiz" className="mt-4"></TabsContent> */}
+      <TabsContent value="quiz" className="mt-4">
+        {!!quiz && <Button>Generate Quiz</Button>}
+      </TabsContent>
 
-      {/* <TabsContent value="flash-cards" className="mt-4"></TabsContent>  */}
+      <TabsContent value="flash-cards" className="mt-4"></TabsContent>
     </Tabs>
   );
 }

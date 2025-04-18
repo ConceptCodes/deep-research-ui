@@ -17,8 +17,12 @@ export const generateQuery = async (state: SummaryState, _: RunnableConfig) => {
     temperature: 0,
   }).withStructuredOutput(outputSchema);
 
+  const topics = [state.researchTopic, ...(state.subTopics || [])]
+    .filter(Boolean)
+    .join(", ");
+
   const result = await llm.invoke([
-    new SystemMessage(queryWriterInstructions(state.researchTopic)),
+    new SystemMessage(queryWriterInstructions(topics)),
     new HumanMessage("Generate a query for web search:"),
   ]);
   return result;

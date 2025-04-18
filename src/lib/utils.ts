@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+
 import type { Event } from "@/hooks/use-store";
 
 export function cn(...inputs: ClassValue[]) {
@@ -42,7 +43,8 @@ export function formatAgentStep(step: AgentStep): Event {
       }, []);
     return {
       title: `Web Research (Round ${step.webResearch.researchLoopCount})`,
-      content: uniqueSources
+      content:
+        uniqueSources
           .map((source) => `🔗 - [${source.title}](${source.url})`)
           .join("\n") ?? "No sources found.",
       timestamp: new Date(),
@@ -70,8 +72,4 @@ export function formatAgentStep(step: AgentStep): Event {
     content: JSON.stringify(step, null, 2),
     timestamp: new Date(),
   };
-}
-
-export function randomUUID() {
-  return crypto.randomUUID();
 }

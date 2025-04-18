@@ -55,7 +55,8 @@ export function EventLog({ projectId }: EventLogProps) {
                   {title}
                 </AccordionTrigger>
                 <AccordionContent>
-                  <pre className="text-wrap overflow-hidden">{content}</pre>
+                  <pre className="mt-1 overflow-x-auto text-wrap rounded bg-gray-100 p-2 text-xs dark:bg-gray-700 dark:text-gray-200">
+                    {content}</pre>
                 </AccordionContent>
               </AccordionItem>
             );

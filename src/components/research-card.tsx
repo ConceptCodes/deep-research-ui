@@ -12,13 +12,14 @@ import {
 import type { Research, Status } from "@/hooks/use-store";
 import useStore from "@/hooks/use-store";
 import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 
 interface ResearchCardProps {
   project: Research;
 }
 
 export function ResearchCard({ project }: ResearchCardProps) {
-  const { setSelectedResearchId } = useStore();
+  const { setSelectedResearchId, deleteResearch } = useStore();
   const router = useRouter();
 
   const statusIcons: Record<Status, React.ReactElement> = {
@@ -47,6 +48,11 @@ export function ResearchCard({ project }: ResearchCardProps) {
   const handleClick = () => {
     setSelectedResearchId(project.id);
     router.push("/research");
+  };
+
+  const handleDelete = (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent the card click event
+    deleteResearch(project.id);
   };
 
   return (
@@ -78,6 +84,9 @@ export function ResearchCard({ project }: ResearchCardProps) {
         <div className="text-sm text-muted-foreground">
           Created: {new Date(project.createdAt).toLocaleDateString()}
         </div>
+        <Button variant="outline" size="sm" onClick={handleDelete}>
+          Delete
+        </Button>
       </CardFooter>
     </Card>
   );

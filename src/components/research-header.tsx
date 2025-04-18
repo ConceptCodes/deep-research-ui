@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { CheckCircle, Clock, HourglassIcon, Loader2Icon } from "lucide-react";
+import {
+  CheckCircle,
+  Clock,
+  Download,
+  HourglassIcon,
+  Loader2Icon,
+} from "lucide-react";
 import { format } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
@@ -7,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 import type { Research } from "@/hooks/use-store";
-import { graph } from "@/lib/deep-research/agent/graph";
+import { graph } from "@/lib/deep-research-v1/agent/graph";
 import useStore from "@/hooks/use-store";
-import { formatAgentStep, randomUUID } from "@/lib/utils";
+import { formatAgentStep } from "@/lib/utils";
 
 interface ResearchHeaderProps {
   project: Research;
@@ -54,7 +60,7 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
     try {
       updateResearch(project.id, { status: "in-progress" });
       setCurrentStatus("in-progress");
-      const threadId = randomUUID();
+      const threadId = crypto.randomUUID();
       const config = { configurable: { thread_id: threadId } };
       const stream = await graph.stream(
         {
@@ -72,11 +78,15 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
       for await (const event of stream) {
         if ("finalizeSummary" in event) {
           const state = await graph.getState(config);
+          const sources = state.values["sourcesGathered"] ?? [];
+          const uniqueSources = Array.from(
+            new Set(sources.map((source: { url: string }) => source.url)),
+          ).map((url) => ({ url }));
 
           updateResearch(project.id, {
             status: "completed",
-            content: state.values["runningSummary"],
-            sources: state.values["sourcesGathered"],
+            content: state.values["runningSummary"] ?? "NO SUMMARY",
+            sources: uniqueSources,
           });
           clearEventLog(project.id);
           window.location.reload();
@@ -121,11 +131,11 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
           {/* <Button variant="outline" size="sm">
             <Share2 className="mr-2 h-4 w-4" />
             Share
-          </Button>
+          </Button> */}
           <Button variant="outline" size="sm">
             <Download className="mr-2 h-4 w-4" />
             Export
-          </Button> */}
+          </Button>
           <Button variant="outline" size="sm" onClick={handleReset}>
             Reset
           </Button>

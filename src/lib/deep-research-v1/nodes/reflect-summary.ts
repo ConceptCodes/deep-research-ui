@@ -30,7 +30,7 @@ export const reflectOnSummary = async (
   if (!followUpQuery) {
     // Fallback to a placeholder query
     return {
-      searchQuery: `Tell me more about ${state.researchTopic} and its subtopics: ${state.subTopics.join(", ")}`,
+      searchQuery: `Tell me more about ${state.researchTopic} and how to it relates to the following subtopics: ${state.subTopics.join(", ")}`,
     };
   }
   return { searchQuery: `Tell me more about ${followUpQuery}` };
