@@ -2,6 +2,10 @@
 
 A browser-based application for conducting AI-powered research using LangGraph, allowing users to manage projects, configure settings, and view generated reports locally.
 
+
+https://github.com/user-attachments/assets/d567e732-519e-45f4-b8d3-87cfec597c57
+
+
 ## Key Features
 
 *   **Create Research Projects:** Define a main topic and related sub-topics for research.
