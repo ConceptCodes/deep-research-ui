@@ -21,23 +21,23 @@ import { useToast } from "@/hooks/use-toast";
 import useStore from "@/hooks/use-store";
 
 export function ApiKeyModal() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [localDeepSeekKey, setLocalDeepSeekKey] = useState("");
-  const [localTavilyKey, setLocalTavilyKey] = useState("");
-  const { toast } = useToast();
-
-  const { setDeepSeekApiKey, deepSeekApiKey, setTavilyApiKey, tavilyApiKey } =
+  const { setOpenAiApiKey, openAiApiKey, setTavilyApiKey, tavilyApiKey } =
     useStore();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localOpenAiKey, setLocalOpenAiKey] = useState(openAiApiKey);
+  const [localTavilyKey, setLocalTavilyKey] = useState(tavilyApiKey);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isModalOpen) {
-      setLocalDeepSeekKey("");
+      setLocalOpenAiKey("");
       setLocalTavilyKey("");
     }
   }, [isModalOpen]);
 
   const handleSaveApiKeys = () => {
-    if (!localDeepSeekKey.trim() && !localTavilyKey.trim()) {
+    if (!localOpenAiKey.trim() && !localTavilyKey.trim()) {
       toast({
         title: "API Key Required",
         description: "Please enter at least one API key.",
@@ -46,8 +46,8 @@ export function ApiKeyModal() {
       return;
     }
 
-    if (localDeepSeekKey.trim()) {
-      setDeepSeekApiKey(localDeepSeekKey.trim());
+    if (localOpenAiKey.trim()) {
+      setOpenAiApiKey(localOpenAiKey.trim());
     }
 
     if (localTavilyKey.trim()) {
@@ -62,13 +62,13 @@ export function ApiKeyModal() {
     setIsModalOpen(false);
   };
 
-  const handleClearDeepSeekKey = () => {
-    setDeepSeekApiKey(null);
-    setLocalDeepSeekKey("");
+  const handleClearOpenAiKey = () => {
+    setOpenAiApiKey(null);
+    setLocalOpenAiKey("");
 
     toast({
-      title: "DeepSeek API Key Removed",
-      description: "Your DeepSeek API key has been removed.",
+      title: "OpenAi API Key Removed",
+      description: "Your OpenAi API key has been removed.",
     });
   };
 
@@ -82,7 +82,7 @@ export function ApiKeyModal() {
     });
   };
 
-  const hasAnyKey = deepSeekApiKey ?? tavilyApiKey;
+  const hasAnyKey = openAiApiKey ?? tavilyApiKey;
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -106,24 +106,20 @@ export function ApiKeyModal() {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="deepSeekApiKey">DeepSeek API Key</Label>
+            <Label htmlFor="deepSeekApiKey">OpenAi API Key</Label>
             <Input
-              id="deepSeekApiKey"
+              id="opeanAiApiKey"
               type="password"
-              placeholder={
-                deepSeekApiKey
-                  ? "••••••••••••••••"
-                  : "Enter your DeepSeek API key"
-              }
-              value={localDeepSeekKey}
-              onChange={(e) => setLocalDeepSeekKey(e.target.value)}
+              placeholder="Enter your OpenAi API key"
+              value={localOpenAiKey}
+              onChange={(e) => setLocalOpenAiKey(e.target.value)}
             />
-            {deepSeekApiKey && (
+            {openAiApiKey && (
               <div className="flex justify-end">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={handleClearDeepSeekKey}
+                  onClick={handleClearOpenAiKey}
                   className="h-6 px-2 text-xs"
                 >
                   Remove Key
@@ -137,9 +133,7 @@ export function ApiKeyModal() {
             <Input
               id="tavilyApiKey"
               type="password"
-              placeholder={
-                tavilyApiKey ? "••••••••••••••••" : "Enter your Tavily API key"
-              }
+              placeholder="Enter your Tavily API key"
               value={localTavilyKey}
               onChange={(e) => setLocalTavilyKey(e.target.value)}
             />

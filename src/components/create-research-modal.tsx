@@ -4,6 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import { PlusCircle, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,10 +19,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 
-import { Slider } from "./ui/slider";
 import useStore from "@/hooks/use-store";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 export function CreateResearchModal() {
@@ -30,10 +37,11 @@ export function CreateResearchModal() {
   const [topicInput, setTopicInput] = useState("");
   const [topics, setTopics] = useState<string[]>([]);
   const [maxLoops, setMaxLoops] = useState(3);
+  const [model, setModel] = useState<"gpt-4o" | "gpt-4o-mini">("gpt-4o-mini");
   const router = useRouter();
   const { toast } = useToast();
 
-  const { addResearch, setSelectedResearchId, deepSeekApiKey, tavilyApiKey } =
+  const { addResearch, setSelectedResearchId, openAiApiKey, tavilyApiKey } =
     useStore();
 
   const handleAddTopic = () => {
@@ -55,6 +63,7 @@ export function CreateResearchModal() {
       subTopics: topics,
       maxResearchLoops: maxLoops,
       status: "pending",
+      model,
     });
 
     setSelectedResearchId(id);
@@ -77,15 +86,15 @@ export function CreateResearchModal() {
 
   const handleOpenModal = () => {
     if (
-      !deepSeekApiKey ||
-      deepSeekApiKey === "" ||
+      !openAiApiKey ||
+      openAiApiKey === "" ||
       !tavilyApiKey ||
       tavilyApiKey === ""
     ) {
       toast({
         title: "API Key Required",
         description:
-          "Please set your DeepSeek and Tavily API keys in the settings.",
+          "Please set your OpenAi and Tavily API keys in the settings.",
         variant: "destructive",
       });
       setIsModalOpen(false);
@@ -160,6 +169,28 @@ export function CreateResearchModal() {
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="model">AI Model</Label>
+            <Select
+              value={model}
+              onValueChange={(value: "gpt-4o" | "gpt-4o-mini") =>
+                setModel(value)
+              }
+            >
+              <SelectTrigger id="model">
+                <SelectValue placeholder="Select AI model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
+                <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Choose the AI model for research generation. GPT-4o is more
+              powerful but slower and more expensive.
+            </p>
           </div>
 
           <div className="grid gap-2">

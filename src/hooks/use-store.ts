@@ -14,12 +14,12 @@ export type QuestionType = "multiple_choice" | "short_answer";
 export interface Research {
   id: number;
   topic: string;
+  model: string;
   subTopics: string[];
   createdAt: string;
   content: string | null;
   status: Status;
   updatedAt: string | null;
-  sources: Source[] | null;
   maxResearchLoops: number;
 }
 
@@ -72,7 +72,7 @@ export interface State {
     question: number;
     flashcard: number;
   };
-  deepSeekApiKey: string | null;
+  openAiApiKey: string | null; // Renamed from deepSeekApiKey
   tavilyApiKey: string | null;
   selectedResearchId: number | null;
   eventLog: Record<string, Event[]>;
@@ -118,8 +118,8 @@ export interface State {
   deleteFlashcard: (id: number) => boolean;
 
   // API Key methods
-  setDeepSeekApiKey: (key: string | null) => void;
-  getDeepSeekApiKey: () => string | null;
+  setOpenAiApiKey: (key: string | null) => void; // Renamed from setDeepSeekApiKey
+  getOpenAiApiKey: () => string | null; // Renamed from getDeepSeekApiKey
   setTavilyApiKey: (key: string | null) => void;
   getTavilyApiKey: () => string | null;
 
@@ -142,7 +142,7 @@ const store: StateCreator<State> = persist(
       question: 1,
       flashcard: 1,
     },
-    deepSeekApiKey: null,
+    openAiApiKey: null, // Renamed from deepSeekApiKey
     tavilyApiKey: null,
     selectedResearchId: null,
     eventLog: {},
@@ -157,7 +157,6 @@ const store: StateCreator<State> = persist(
         createdAt: new Date().toISOString(),
         updatedAt: null,
         content: null,
-        sources: null,
       };
 
       set((state) => ({
@@ -417,8 +416,8 @@ const store: StateCreator<State> = persist(
     },
 
     // API Key methods
-    setDeepSeekApiKey: (key) => set({ deepSeekApiKey: key }),
-    getDeepSeekApiKey: () => get().deepSeekApiKey,
+    setOpenAiApiKey: (key) => set({ openAiApiKey: key }), // Renamed from setDeepSeekApiKey
+    getOpenAiApiKey: () => get().openAiApiKey, // Renamed from getDeepSeekApiKey
     setTavilyApiKey: (key) => set({ tavilyApiKey: key }),
     getTavilyApiKey: () => get().tavilyApiKey,
 
@@ -454,7 +453,7 @@ const store: StateCreator<State> = persist(
           question: 1,
           flashcard: 1,
         },
-        deepSeekApiKey: null,
+        openAiApiKey: null, // Renamed from deepSeekApiKey
         tavilyApiKey: null,
         selectedResearchId: null,
         eventLog: {},

@@ -12,23 +12,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+import { graph } from "@/lib/deep-research/agent/graph";
 import type { Research } from "@/hooks/use-store";
-import { graph } from "@/lib/deep-research-v1/agent/graph";
 import useStore from "@/hooks/use-store";
-import { formatAgentStep } from "@/lib/utils";
 
 interface ResearchHeaderProps {
   project: Research;
 }
 
 export function ResearchHeader({ project }: ResearchHeaderProps) {
-  const {
-    deepSeekApiKey,
-    tavilyApiKey,
-    addEvent,
-    updateResearch,
-    clearEventLog,
-  } = useStore();
+  const { getOpenAiApiKey, getTavilyApiKey, updateResearch, clearEventLog } =
+    useStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(project.status);
 
@@ -60,41 +54,26 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
     try {
       updateResearch(project.id, { status: "in-progress" });
       setCurrentStatus("in-progress");
-      const threadId = crypto.randomUUID();
-      const config = { configurable: { thread_id: threadId } };
-      const stream = await graph.stream(
+
+      const result = await graph.invoke(
         {
-          researchTopic: project.topic,
-          subTopics: project.subTopics,
-          apiKey: deepSeekApiKey!,
-          tavilyApiKey: tavilyApiKey!,
-          maxResearchLoops: project.maxResearchLoops,
+          topic: `${project.topic}, ${project.subTopics.join(", ")}`,
         },
         {
-          streamMode: "updates" as const,
-          ...config,
+          configurable: {
+            researchLoopCount: project.maxResearchLoops,
+            openAiApiKey: getOpenAiApiKey() ?? "",
+            tavilyApiKey: getTavilyApiKey() ?? "",
+            openAiModel: project.model,
+          },
         },
       );
-      for await (const event of stream) {
-        if ("finalizeSummary" in event) {
-          const state = await graph.getState(config);
-          const sources = state.values["sourcesGathered"] ?? [];
-          const uniqueSources = Array.from(
-            new Set(sources.map((source: { url: string }) => source.url)),
-          ).map((url) => ({ url }));
-
-          updateResearch(project.id, {
-            status: "completed",
-            content: state.values["runningSummary"] ?? "NO SUMMARY",
-            sources: uniqueSources,
-          });
-          clearEventLog(project.id);
-          window.location.reload();
-        } else {
-          const data = formatAgentStep(event);
-          addEvent(project.id, data);
-        }
-      }
+      updateResearch(project.id, {
+        status: "completed",
+        content: result.finalReport,
+      });
+      setCurrentStatus("completed");
+      window.location.reload();
     } catch (error) {
       console.error("Error generating research:", error);
     } finally {

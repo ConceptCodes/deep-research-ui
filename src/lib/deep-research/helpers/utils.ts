@@ -1,28 +1,6 @@
 import axios from "axios";
-import type { Section } from "./agent/state";
-
-export function formatSections(sections: Section[]): string {
-  let formattedStr = "";
-
-  sections.forEach((section, index) => {
-    const separator = "=".repeat(60);
-    formattedStr += `
-${separator}
-Section ${index + 1}: ${section.name}
-${separator}
-Description:
-${section.description}
-Requires Research:
-${section.research}
-
-Content:
-${section.content || "[Not yet written]"}
-
-`;
-  });
-
-  return formattedStr;
-}
+import type { Section } from "./types";
+import { MAX_SEARCH_RESULTS } from "./constants";
 
 type SearchResult = {
   title: string;
@@ -35,6 +13,25 @@ type SearchResult = {
 type SearchResponse = {
   query: string;
   results: SearchResult[];
+};
+
+export const formatSections = (sections: Section[]): string => {
+  let formatted_str = "";
+  sections.forEach((section, index) => {
+    const idx = index + 1;
+    const separator = "=".repeat(60);
+    formatted_str += `
+${separator}
+Section ${idx}: ${section.title} 
+${separator}
+Description: ${section.description}
+
+Requires Research: ${section.research}
+
+Content: ${section.content}"}
+`;
+  });
+  return formatted_str.trim();
 };
 
 export function deduplicateAndFormatSources(
@@ -84,8 +81,8 @@ export function deduplicateAndFormatSources(
 }
 
 export const tavilySearch = async (
-  apiKey: string,
   query: string,
+  apiKey: string,
 ): Promise<SearchResponse> => {
   try {
     const response = await axios({
@@ -98,7 +95,7 @@ export const tavilySearch = async (
       data: {
         query: query,
         search_depth: "advanced",
-        max_results: 3,
+        max_results: MAX_SEARCH_RESULTS,
         include_raw_content: true,
       },
     });
