@@ -131,7 +131,7 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
           <Button
             size="sm"
             onClick={handleGenerate}
-            disabled={isGenerating || currentStatus === "in-progress"}
+            disabled={isGenerating || ["completed", "in-progress"].includes(currentStatus)}
           >
             {isGenerating ? (
               <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
