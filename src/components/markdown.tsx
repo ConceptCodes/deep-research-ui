@@ -2,6 +2,16 @@ import React from "react";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 import "katex/dist/katex.min.css";
 
@@ -17,7 +27,7 @@ export default function Markdown({
   return (
     <div className="prose dark:prose-invert max-w-prose p-3">
       <ReactMarkdown
-        remarkPlugins={[remarkMath]}
+        remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex]}
         components={{
           h1: ({ className, ...props }) => (
@@ -123,41 +133,21 @@ export default function Markdown({
             />
           ),
           hr: ({ ...props }) => <hr className="my-4 md:my-8" {...props} />,
-          table: ({
-            className,
-            ...props
-          }: React.HTMLAttributes<HTMLTableElement>) => (
-            <div className="my-6 w-full overflow-y-auto">
-              <table className={cn("w-full", className)} {...props} />
-            </div>
-          ),
+          table: ({ node, ...props }) => <Table {...props} />,
+          thead: ({ node, ...props }) => <TableHeader {...props} />,
+          tbody: ({ node, ...props }) => <TableBody {...props} />,
           tr: ({
-            className,
+            node,
+            isHeader, // Acknowledge the isHeader prop
             ...props
-          }: React.HTMLAttributes<HTMLTableRowElement>) => (
-            <tr
-              className={cn("m-0 border-t p-0 even:bg-muted", className)}
-              {...props}
-            />
+          }: {
+            node?: any;
+            isHeader?: boolean; // Add isHeader to the type definition
+          } & React.HTMLAttributes<HTMLTableRowElement>) => (
+            <TableRow {...props} />
           ),
-          th: ({ className, ...props }) => (
-            <th
-              className={cn(
-                "border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
-                className,
-              )}
-              {...props}
-            />
-          ),
-          td: ({ className, ...props }) => (
-            <td
-              className={cn(
-                "border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
-                className,
-              )}
-              {...props}
-            />
-          ),
+          th: ({ node, ...props }) => <TableHead {...props} />,
+          td: ({ node, ...props }) => <TableCell {...props} />,
           pre: ({ className, ...props }) => (
             <pre
               className={cn(
