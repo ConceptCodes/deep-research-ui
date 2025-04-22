@@ -15,6 +15,7 @@ import { Card } from "@/components/ui/card";
 import { graph } from "@/lib/deep-research/agent/graph";
 import type { Research } from "@/hooks/use-store";
 import useStore from "@/hooks/use-store";
+import useDownload from "@/hooks/use-download";
 
 interface ResearchHeaderProps {
   project: Research;
@@ -25,6 +26,7 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
     useStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(project.status);
+  const downloadMarkdown = useDownload(project.content, `${project.topic}.md`);
 
   const statusIcons = {
     completed: <CheckCircle className="h-5 w-5 text-green-500" />,
@@ -47,6 +49,14 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
       "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300",
     pending: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
     failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  };
+
+  const handleDownload = () => {
+    if (project.content) {
+      downloadMarkdown();
+    } else {
+      console.error("No content available for download.");
+    }
   };
 
   const handleGenerate = async () => {
@@ -111,7 +121,7 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
             <Share2 className="mr-2 h-4 w-4" />
             Share
           </Button> */}
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={downloadMarkdown}>
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>

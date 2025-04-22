@@ -1,10 +1,10 @@
-import { Calendar, Clock, FileText } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { format } from "date-fns";
 import type { Research } from "@/hooks/use-store";
+import { Badge } from "./ui/badge";
 
 interface ResearchSidebarProps {
   project: Research;
@@ -28,30 +28,9 @@ export function ResearchSidebar({ project }: ResearchSidebarProps) {
                 </p>
               </div>
             </div>
-
-            {project.status === "completed" && (
-              <>
-                <Separator />
-
-                <div className="flex items-start gap-3">
-                  <FileText className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Content Stats</p>
-                    <div className="text-sm text-muted-foreground">
-                      <p>
-                        Summary:{" "}
-                        {project.content
-                          ? `${project.content.length} chars`
-                          : "N/A"}
-                      </p>
-                      <p>
-                        Sources: {project.sources ? project.sources.length : 0}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
+            <Badge className="w-fit">
+              {project.model}
+            </Badge>
           </div>
         </CardContent>
       </Card>
@@ -74,7 +53,7 @@ export function ResearchSidebar({ project }: ResearchSidebarProps) {
             ))}
 
             {/* Additional suggested topics */}
-            <Separator className="my-2" />
+            {/* <Separator className="my-2" />
             <p className="mb-2 text-sm text-muted-foreground">
               Suggested related topics:
             </p>
@@ -86,7 +65,7 @@ export function ResearchSidebar({ project }: ResearchSidebarProps) {
             </Button>
             <Button variant="ghost" size="sm" className="mb-2 mr-2">
               Renewable Energy
-            </Button>
+            </Button> */}
           </div>
         </CardContent>
       </Card>
