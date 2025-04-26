@@ -219,7 +219,6 @@ const store: StateCreator<State> = persist(
         questions: [],
         score: null,
         review: null,
-        breakdown: null,
       };
 
       set((state) => ({
@@ -283,6 +282,7 @@ const store: StateCreator<State> = persist(
         id: get().nextIds.question,
         createdAt: new Date().toISOString(),
         updatedAt: null,
+        submission: null,
       };
 
       set((state) => {
