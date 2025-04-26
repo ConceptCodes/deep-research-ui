@@ -15,8 +15,8 @@ import {
   MAX_TOKENS_PER_SOURCE,
   NUMBER_OF_QUERIES,
 } from "../helpers/constants";
-import { getLLM } from "../helpers/llm";
 import { tavilySearch, deduplicateAndFormatSources } from "../helpers/utils";
+import { getLLM } from "@/lib/utils";
 
 const writerOutputSchema = z.object({
   queries: z

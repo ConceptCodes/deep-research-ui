@@ -8,7 +8,7 @@ import type {
   SectionStateAnnotation,
 } from "../agent/state";
 import { NUMBER_OF_QUERIES } from "../helpers/constants";
-import { getLLM } from "../helpers/llm";
+import { getLLM } from "@/lib/utils";
 
 const outputSchema = z.object({
   searchQueries: z.string().array().describe("List of search queries"),
@@ -23,8 +23,8 @@ export const generateQueryNode = async (
   } = state;
 
   const llm = getLLM(
-    config.configurable.openAiApiKey,
-    config.configurable.openAiModel,
+    config.configurable?.openAiApiKey!,
+    config.configurable?.openAiModel!,
   );
 
   const structuredLLM = llm.withStructuredOutput(outputSchema);

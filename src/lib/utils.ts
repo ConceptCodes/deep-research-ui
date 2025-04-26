@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { ChatOpenAI } from "@langchain/openai";
 
 import type { Event } from "@/hooks/use-store";
 
@@ -73,3 +74,11 @@ export function formatAgentStep(step: AgentStep): Event {
     timestamp: new Date(),
   };
 }
+
+export const getLLM = (apiKey: string, model: string) => {
+  return new ChatOpenAI({
+    modelName: model,
+    temperature: 0,
+    openAIApiKey: apiKey,
+  });
+};

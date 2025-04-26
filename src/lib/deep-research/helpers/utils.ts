@@ -93,8 +93,8 @@ export const tavilySearch = async (
         Authorization: `Bearer ${apiKey}`,
       },
       data: {
-        query: query,
-        search_depth: "advanced",
+        query,
+        search_depth: "basic",
         max_results: MAX_SEARCH_RESULTS,
         include_raw_content: true,
       },

@@ -5,7 +5,7 @@ import type {
   SectionStateAnnotation,
   AgentConfigurationAnnotation,
 } from "../agent/state";
-import { getLLM } from "../helpers/llm";
+import { getLLM } from "@/lib/utils";
 
 export const writeFinalSectionsNode = async (
   state: typeof SectionStateAnnotation.State,
@@ -14,8 +14,8 @@ export const writeFinalSectionsNode = async (
   const { topic, section, reportSectionsFromResearch } = state;
 
   const llm = getLLM(
-    config.configurable.openAiApiKey,
-    config.configurable.openAiModel,
+    config.configurable?.openAiApiKey,
+    config.configurable?.openAiModel,
   );
 
   const prompt = finalSectionWriterInstructions(

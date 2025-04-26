@@ -11,7 +11,7 @@ export type Status = "completed" | "in-progress" | "failed" | "pending";
 
 export type QuestionType = "multiple_choice" | "short_answer";
 
-export interface Research {
+export type Research = {
   id: number;
   topic: string;
   model: string;
@@ -21,11 +21,10 @@ export interface Research {
   status: Status;
   updatedAt: string | null;
   maxResearchLoops: number;
-}
+};
 
-export interface Question {
+export type Question = {
   id: number;
-  name: string | null;
   createdAt: string;
   quizId: number;
   label: string | null;
@@ -33,36 +32,34 @@ export interface Question {
   answer: string | null;
   submission: string | null;
   updatedAt: string | null;
-}
+};
 
-export interface Quiz {
+export type Quiz = {
   id: number;
-  name: string | null;
   topicId: number;
   createdAt: string;
   score: number | null;
   review: string | null;
-  breakdown: string | null;
   updatedAt: string | null;
   questions: Question[];
-}
+};
 
-export interface Flashcard {
+export type Flashcard = {
   id: number;
   question: string | null;
   answer: string | null;
   topicId: number;
   createdAt: string;
   updatedAt: string | null;
-}
+};
 
-export interface Event {
+export type Event = {
   title: string;
   content: string;
   timestamp: Date;
-}
+};
 
-export interface State {
+export type State = {
   research: Research[];
   quizzes: Quiz[];
   flashcards: Flashcard[];
@@ -72,7 +69,7 @@ export interface State {
     question: number;
     flashcard: number;
   };
-  openAiApiKey: string | null; // Renamed from deepSeekApiKey
+  openAiApiKey: string | null;
   tavilyApiKey: string | null;
   selectedResearchId: number | null;
   eventLog: Record<string, Event[]>;
@@ -94,7 +91,10 @@ export interface State {
   getQuiz: (id: number) => Quiz | null;
   getQuizzesByTopicId: (topicId: number) => Quiz[];
   addQuiz: (
-    quiz: Omit<Quiz, "id" | "createdAt" | "updatedAt" | "questions">,
+    quiz: Omit<
+      Quiz,
+      "id" | "createdAt" | "updatedAt" | "questions" | "score" | "review"
+    >,
   ) => Quiz;
   updateQuiz: (id: number, data: Partial<Quiz>) => boolean;
   deleteQuiz: (id: number) => boolean;
@@ -103,7 +103,7 @@ export interface State {
   getQuestion: (id: number) => Question | undefined;
   getQuestionsByQuizId: (quizId: number) => Question[];
   addQuestion: (
-    question: Omit<Question, "id" | "createdAt" | "updatedAt">,
+    question: Omit<Question, "id" | "createdAt" | "updatedAt" | "submission">,
   ) => Question;
   updateQuestion: (id: number, data: Partial<Question>) => boolean;
   deleteQuestion: (id: number) => boolean;
@@ -118,8 +118,8 @@ export interface State {
   deleteFlashcard: (id: number) => boolean;
 
   // API Key methods
-  setOpenAiApiKey: (key: string | null) => void; // Renamed from setDeepSeekApiKey
-  getOpenAiApiKey: () => string | null; // Renamed from getDeepSeekApiKey
+  setOpenAiApiKey: (key: string | null) => void;
+  getOpenAiApiKey: () => string | null;
   setTavilyApiKey: (key: string | null) => void;
   getTavilyApiKey: () => string | null;
 
@@ -129,7 +129,7 @@ export interface State {
 
   // Utilities
   clearStore: () => void;
-}
+};
 
 const store: StateCreator<State> = persist(
   (set, get) => ({
@@ -142,7 +142,7 @@ const store: StateCreator<State> = persist(
       question: 1,
       flashcard: 1,
     },
-    openAiApiKey: null, // Renamed from deepSeekApiKey
+    openAiApiKey: null,
     tavilyApiKey: null,
     selectedResearchId: null,
     eventLog: {},
@@ -207,7 +207,7 @@ const store: StateCreator<State> = persist(
     },
 
     // Quiz methods
-    getQuiz: (id) => get().quizzes.find((q) => q.id === id) ?? null,
+    getQuiz: (id) => get().quizzes.find((q) => q.topicId === id) ?? null,
     getQuizzesByTopicId: (topicId) =>
       get().quizzes.filter((q) => q.topicId === topicId),
     addQuiz: (quiz) => {
@@ -217,6 +217,9 @@ const store: StateCreator<State> = persist(
         createdAt: new Date().toISOString(),
         updatedAt: null,
         questions: [],
+        score: null,
+        review: null,
+        breakdown: null,
       };
 
       set((state) => ({
@@ -453,7 +456,7 @@ const store: StateCreator<State> = persist(
           question: 1,
           flashcard: 1,
         },
-        openAiApiKey: null, // Renamed from deepSeekApiKey
+        openAiApiKey: null,
         tavilyApiKey: null,
         selectedResearchId: null,
         eventLog: {},

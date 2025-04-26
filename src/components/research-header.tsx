@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 import { graph } from "@/lib/deep-research/agent/graph";
+import { generateQuizQuestions } from "@/lib/quiz";
+import { generateFlashCards } from "@/lib/flash-cards";
+
 import type { Research } from "@/hooks/use-store";
 import useStore from "@/hooks/use-store";
 import useDownload from "@/hooks/use-download";
@@ -22,11 +25,23 @@ interface ResearchHeaderProps {
 }
 
 export function ResearchHeader({ project }: ResearchHeaderProps) {
-  const { getOpenAiApiKey, getTavilyApiKey, updateResearch, clearEventLog } =
-    useStore();
+  const {
+    getOpenAiApiKey,
+    getTavilyApiKey,
+    updateResearch,
+    clearEventLog,
+    addFlashcard,
+    getQuiz,
+    getFlashcardsByTopicId,
+    addQuestion,
+    addQuiz,
+    openAiApiKey,
+    tavilyApiKey,
+  } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(project.status);
-  const downloadMarkdown = useDownload(project.content, `${project.topic}.md`);
+
+  const downloadMarkdown = useDownload(project.content!, `${project.topic}.md`);
 
   const statusIcons = {
     completed: <CheckCircle className="h-5 w-5 text-green-500" />,
@@ -59,6 +74,34 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
     }
   };
 
+  const handleGenerateFlashCards = async (source: string) => {
+    const generatedFlashCards = await generateFlashCards(
+      source,
+      project.model,
+      openAiApiKey,
+    );
+    for (const flashCard of generatedFlashCards) {
+      addFlashcard({ topicId: project.id, ...flashCard });
+    }
+  };
+
+  const handleGenerateQuiz = async (source: string) => {
+    const generatedQuizQuestions = await generateQuizQuestions(
+      source,
+      project.model,
+      openAiApiKey,
+    );
+    const newQuiz = addQuiz({ topicId: project.id });
+    for (const question of generatedQuizQuestions) {
+      addQuestion({
+        label: question.label,
+        answer: question.answer,
+        type: question.type,
+        quizId: newQuiz.id,
+      });
+    }
+  };
+
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
@@ -72,8 +115,8 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
         {
           configurable: {
             researchLoopCount: project.maxResearchLoops,
-            openAiApiKey: getOpenAiApiKey() ?? "",
-            tavilyApiKey: getTavilyApiKey() ?? "",
+            openAiApiKey: openAiApiKey ?? "",
+            tavilyApiKey: tavilyApiKey ?? "",
             openAiModel: project.model,
           },
         },
@@ -82,6 +125,10 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
         status: "completed",
         content: result.finalReport,
       });
+      await Promise.all([
+        handleGenerateFlashCards(result.finalReport),
+        handleGenerateQuiz(result.finalReport),
+      ]);
       setCurrentStatus("completed");
       window.location.reload();
     } catch (error) {
@@ -121,7 +168,7 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
             <Share2 className="mr-2 h-4 w-4" />
             Share
           </Button> */}
-          <Button variant="outline" size="sm" onClick={downloadMarkdown}>
+          <Button variant="outline" size="sm" onClick={handleDownload}>
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
@@ -131,7 +178,10 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
           <Button
             size="sm"
             onClick={handleGenerate}
-            disabled={isGenerating || ["completed", "in-progress"].includes(currentStatus)}
+            disabled={
+              isGenerating ||
+              ["completed", "in-progress"].includes(currentStatus)
+            }
           >
             {isGenerating ? (
               <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />

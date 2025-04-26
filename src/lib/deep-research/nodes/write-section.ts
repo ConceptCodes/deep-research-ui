@@ -13,7 +13,7 @@ import type {
   SectionStateAnnotation,
   AgentConfigurationAnnotation,
 } from "../agent/state";
-import { getLLM } from "../helpers/llm";
+import { getLLM } from "@/lib/utils";
 
 const outputSchema = z.object({
   grade: z
@@ -29,7 +29,7 @@ export const writeSectionNode = async (
   state: typeof SectionStateAnnotation.State,
   config: typeof AgentConfigurationAnnotation.State,
 ) => {
-  const { topic, section, source, searchIterations, researchLoopCount } = state;
+  const { topic, section, source, searchIterations } = state;
 
   const prompt = sectionWriterPrompt(
     topic,
@@ -40,8 +40,8 @@ export const writeSectionNode = async (
   );
 
   const llm = getLLM(
-    config.configurable.openAiApiKey,
-    config.configurable.openAiModel,
+    config.configurable?.openAiApiKey,
+    config.configurable?.openAiModel,
   );
 
   const newText = await llm.invoke([
@@ -67,7 +67,8 @@ export const writeSectionNode = async (
     new HumanMessage({ content: sectionGraderPrompt }),
   ]);
 
-  const hitDepthLimit = searchIterations >= researchLoopCount;
+  const hitDepthLimit =
+    searchIterations >= config.configurable?.researchLoopCount;
 
   if (grade === "pass" || hitDepthLimit) {
     return new Command({

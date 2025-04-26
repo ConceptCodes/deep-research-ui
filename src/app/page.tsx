@@ -2,7 +2,7 @@
 
 import { ResearchCard } from "@/components/research-card";
 import { CreateResearchModal } from "@/components/create-research-modal";
-import { ApiKeyModal } from "@/components/set-api-key-modal";
+import { ApiKeyModal } from "@/components/api-key-modal";
 
 import useStore from "@/hooks/use-store";
 

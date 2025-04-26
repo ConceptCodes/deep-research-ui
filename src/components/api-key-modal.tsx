@@ -37,7 +37,7 @@ export function ApiKeyModal() {
   }, [isModalOpen]);
 
   const handleSaveApiKeys = () => {
-    if (!localOpenAiKey.trim() && !localTavilyKey.trim()) {
+    if (!localOpenAiKey?.trim() && !localTavilyKey?.trim()) {
       toast({
         title: "API Key Required",
         description: "Please enter at least one API key.",
@@ -46,11 +46,11 @@ export function ApiKeyModal() {
       return;
     }
 
-    if (localOpenAiKey.trim()) {
+    if (localOpenAiKey?.trim()) {
       setOpenAiApiKey(localOpenAiKey.trim());
     }
 
-    if (localTavilyKey.trim()) {
+    if (localTavilyKey?.trim()) {
       setTavilyApiKey(localTavilyKey.trim());
     }
 
@@ -111,7 +111,7 @@ export function ApiKeyModal() {
               id="opeanAiApiKey"
               type="password"
               placeholder="Enter your OpenAi API key"
-              value={localOpenAiKey}
+              value={localOpenAiKey!}
               onChange={(e) => setLocalOpenAiKey(e.target.value)}
             />
             {openAiApiKey && (
@@ -134,7 +134,7 @@ export function ApiKeyModal() {
               id="tavilyApiKey"
               type="password"
               placeholder="Enter your Tavily API key"
-              value={localTavilyKey}
+              value={localTavilyKey!}
               onChange={(e) => setLocalTavilyKey(e.target.value)}
             />
             {tavilyApiKey && (

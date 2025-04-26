@@ -1,25 +1,40 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Markdown from "@/components/markdown";
 import { EventLog } from "@/components/event-log";
-import { useState } from "react";
 
-import useStore, { type Quiz, type Research } from "@/hooks/use-store";
+import { FlashCard } from "./flash-card";
+import { QuizQuestion } from "./quiz-question";
 import { Button } from "./ui/button";
+
+import useStore, { type Research } from "@/hooks/use-store";
+import { gradeQuiz } from "@/lib/quiz";
 
 interface ResearchContentProps {
   project: Research;
 }
 
 export function ResearchContent({ project }: ResearchContentProps) {
-  const { getQuiz } = useStore();
-  const [quiz, setQuiz] = useState<Quiz | null>(getQuiz(project.id));
+  const { getQuiz, getFlashcardsByTopicId, updateQuestion, openAiApiKey } =
+    useStore();
+  const quiz = getQuiz(project.id);
+  const flashCards = getFlashcardsByTopicId(project.id);
+
+  const handleAnswerChange = (questionId: number, answer: string) => {
+    updateQuestion(questionId, {
+      submission: answer,
+    });
+  };
+
+  const handleQuizSubmit = async () => {
+    const results = await gradeQuiz(
+      project.content,
+      quiz?.questions,
+      project.model,
+      openAiApiKey,
+    );
+    console.log(results);
+  };
 
   return project.status !== "completed" ? (
     <EventLog projectId={project.id} />
@@ -42,10 +57,37 @@ export function ResearchContent({ project }: ResearchContentProps) {
       </TabsContent>
 
       <TabsContent value="quiz" className="mt-4">
-        {!!quiz && <Button>Generate Quiz</Button>}
+        {quiz && (
+          <>
+            <div className="grid grid-cols-1 gap-4">
+              {quiz.questions.map((question) => (
+                <QuizQuestion
+                  key={question.id}
+                  question={question}
+                  onAnswerChange={handleAnswerChange}
+                />
+              ))}
+            </div>
+            <Button onClick={handleQuizSubmit} className="mt-4">
+              Submit Quiz
+            </Button>
+          </>
+        )}
       </TabsContent>
 
-      <TabsContent value="flash-cards" className="mt-4"></TabsContent>
+      <TabsContent value="flash-cards" className="mt-4">
+        {flashCards && (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {flashCards.map((flashCard) => (
+              <FlashCard
+                key={flashCard.id}
+                question={flashCard.question!}
+                answer={flashCard.answer!}
+              />
+            ))}
+          </div>
+        )}
+      </TabsContent>
     </Tabs>
   );
 }
