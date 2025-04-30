@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Key } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,8 +29,15 @@ export function ApiKeyModal() {
   const [localTavilyKey, setLocalTavilyKey] = useState(tavilyApiKey);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (isModalOpen) {
+      setLocalOpenAiKey("");
+      setLocalTavilyKey("");
+    }
+  }, [isModalOpen]);
+
   const handleSaveApiKeys = () => {
-    if (!localOpenAiKey?.trim() && !localTavilyKey?.trim()) {
+    if (!localOpenAiKey.trim() && !localTavilyKey.trim()) {
       toast({
         title: "API Key Required",
         description: "Please enter at least one API key.",
@@ -39,11 +46,11 @@ export function ApiKeyModal() {
       return;
     }
 
-    if (localOpenAiKey?.trim()) {
+    if (localOpenAiKey.trim()) {
       setOpenAiApiKey(localOpenAiKey.trim());
     }
 
-    if (localTavilyKey?.trim()) {
+    if (localTavilyKey.trim()) {
       setTavilyApiKey(localTavilyKey.trim());
     }
 
@@ -102,9 +109,9 @@ export function ApiKeyModal() {
             <Label htmlFor="deepSeekApiKey">OpenAi API Key</Label>
             <Input
               id="opeanAiApiKey"
-              type="text"
+              type="password"
               placeholder="Enter your OpenAi API key"
-              value={localOpenAiKey!}
+              value={localOpenAiKey}
               onChange={(e) => setLocalOpenAiKey(e.target.value)}
             />
             {openAiApiKey && (
@@ -125,9 +132,9 @@ export function ApiKeyModal() {
             <Label htmlFor="tavilyApiKey">Tavily API Key</Label>
             <Input
               id="tavilyApiKey"
-              type="text"
+              type="password"
               placeholder="Enter your Tavily API key"
-              value={localTavilyKey!}
+              value={localTavilyKey}
               onChange={(e) => setLocalTavilyKey(e.target.value)}
             />
             {tavilyApiKey && (

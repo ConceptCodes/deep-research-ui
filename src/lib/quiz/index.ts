@@ -9,6 +9,7 @@ export const generateQuestionsOutputSchema = z.object({
       label: z.string(),
       answer: z.string(),
       type: z.enum(["multiple_choice", "short_answer"]),
+      options: z.array(z.string()).optional(),
     }),
   ),
 });
@@ -20,7 +21,9 @@ export const generateQuizQuestions = async (
   source: string | null,
   model: string,
   apiKey: string | null,
-): Promise<{ label: string; answer: string; type: QuestionType }[]> => {
+): Promise<
+  Array<{ label: string; answer: string; type: QuestionType; options: string[] }>
+> => {
   if (!source) {
     throw new Error("Source is required");
   }
@@ -46,7 +49,10 @@ export const breakdownOutputSchema = z.object({
   feedback: z.string(),
 });
 
-const gradeQuizPrompt = (source: string | null, results: Question[] | undefined) =>
+const gradeQuizPrompt = (
+  source: string | null,
+  results: Question[] | undefined,
+) =>
   `Grade the following quiz based on the source material: "${source}". 
 The quiz questions and answers are as follows: ${JSON.stringify(results, null, 2)}`;
 

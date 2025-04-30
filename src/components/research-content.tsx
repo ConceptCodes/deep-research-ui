@@ -17,24 +17,24 @@ interface ResearchContentProps {
 export function ResearchContent({ project }: ResearchContentProps) {
   const { getQuiz, getFlashcardsByTopicId, updateQuestion, openAiApiKey } =
     useStore();
-  const quiz = getQuiz(project.id);
+  // const quiz = getQuiz(project.id);
   const flashCards = getFlashcardsByTopicId(project.id);
 
-  const handleAnswerChange = (questionId: number, answer: string) => {
-    updateQuestion(questionId, {
-      submission: answer,
-    });
-  };
+  // const handleAnswerChange = (questionId: number, answer: string) => {
+  //   updateQuestion(questionId, {
+  //     submission: answer,
+  //   });
+  // };
 
-  const handleQuizSubmit = async () => {
-    const results = await gradeQuiz(
-      project.content,
-      quiz?.questions,
-      project.model,
-      openAiApiKey,
-    );
-    console.log(results);
-  };
+  // const handleQuizSubmit = async () => {
+  //   const results = await gradeQuiz(
+  //     project.content,
+  //     quiz?.questions,
+  //     project.model,
+  //     openAiApiKey,
+  //   );
+  //   console.log(results);
+  // };
 
   return project.status !== "completed" ? (
     <EventLog projectId={project.id} />
@@ -42,7 +42,7 @@ export function ResearchContent({ project }: ResearchContentProps) {
     <Tabs defaultValue="summary" className="w-full">
       <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="summary">Summary</TabsTrigger>
-        <TabsTrigger value="quiz">Quiz</TabsTrigger>
+        {/* <TabsTrigger value="quiz">Quiz</TabsTrigger> */}
         <TabsTrigger value="flash-cards">Flash Cards</TabsTrigger>
       </TabsList>
 
@@ -56,7 +56,7 @@ export function ResearchContent({ project }: ResearchContentProps) {
         </Card>
       </TabsContent>
 
-      <TabsContent value="quiz" className="mt-4">
+      {/* <TabsContent value="quiz" className="mt-4">
         {quiz && (
           <>
             <div className="grid grid-cols-1 gap-4">
@@ -73,7 +73,7 @@ export function ResearchContent({ project }: ResearchContentProps) {
             </Button>
           </>
         )}
-      </TabsContent>
+      </TabsContent> */}
 
       <TabsContent value="flash-cards" className="mt-4">
         {flashCards && (

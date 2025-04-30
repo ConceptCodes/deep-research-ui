@@ -81,3 +81,7 @@ The application uses a LangGraph agent defined in [`src/lib/deep-research/agent/
 3.  The UI subscribes to updates from the agent (via Zustand state) to display the real-time event log and final report content.
 
 *(See [Deep Researcher Module](https://github.com/ConceptCodes/langgraph-scratchpad-js/blob/main/src/research/README.md) for more details on the agent's internal architecture).*
+
+### Roadmap
+- [ ] Add the quiz and review module
+- [ ] add a graph visualization during research generation

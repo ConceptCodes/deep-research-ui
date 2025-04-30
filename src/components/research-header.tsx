@@ -1,16 +1,10 @@
 import { useState } from "react";
-import {
-  CheckCircle,
-  Clock,
-  Download,
-  HourglassIcon,
-  Loader2Icon,
-} from "lucide-react";
+import { Loader2Icon, Download } from "lucide-react";
 import { format } from "date-fns";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { StatusBadge } from "@/components/status-badge";
 
 import { graph } from "@/lib/deep-research/agent/graph";
 import { generateQuizQuestions } from "@/lib/quiz";
@@ -20,19 +14,15 @@ import type { Research } from "@/hooks/use-store";
 import useStore from "@/hooks/use-store";
 import useDownload from "@/hooks/use-download";
 
-interface ResearchHeaderProps {
+type ResearchHeaderProps = {
   project: Research;
-}
+};
 
 export function ResearchHeader({ project }: ResearchHeaderProps) {
   const {
-    getOpenAiApiKey,
-    getTavilyApiKey,
     updateResearch,
     clearEventLog,
     addFlashcard,
-    getQuiz,
-    getFlashcardsByTopicId,
     addQuestion,
     addQuiz,
     openAiApiKey,
@@ -42,29 +32,6 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
   const [currentStatus, setCurrentStatus] = useState(project.status);
 
   const downloadMarkdown = useDownload(project.content!, `${project.topic}.md`);
-
-  const statusIcons = {
-    completed: <CheckCircle className="h-5 w-5 text-green-500" />,
-    "in-progress": <Clock className="h-5 w-5 text-amber-500" />,
-    pending: <HourglassIcon className="h-5 w-5 text-blue-500" />,
-    failed: <Clock className="h-5 w-5 text-red-500" />,
-  };
-
-  const statusText = {
-    completed: "Completed",
-    "in-progress": "In Progress",
-    pending: "Pending",
-    failed: "Failed",
-  };
-
-  const statusColors = {
-    completed:
-      "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-    "in-progress":
-      "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300",
-    pending: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-    failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-  };
 
   const handleDownload = () => {
     if (project.content) {
@@ -85,28 +52,30 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
     }
   };
 
-  const handleGenerateQuiz = async (source: string) => {
-    const generatedQuizQuestions = await generateQuizQuestions(
-      source,
-      project.model,
-      openAiApiKey,
-    );
-    const newQuiz = addQuiz({ topicId: project.id });
-    for (const question of generatedQuizQuestions) {
-      addQuestion({
-        label: question.label,
-        answer: question.answer,
-        type: question.type,
-        quizId: newQuiz.id,
-      });
-    }
-  };
+  // const handleGenerateQuiz = async (source: string) => {
+  //   const generatedQuizQuestions = await generateQuizQuestions(
+  //     source,
+  //     project.model,
+  //     openAiApiKey,
+  //   );
+  //   const newQuiz = addQuiz({ topicId: project.id });
+  //   for (const question of generatedQuizQuestions) {
+  //     addQuestion({
+  //       label: question.label,
+  //       answer: question.answer,
+  //       type: question.type,
+  //       quizId: newQuiz.id,
+  //       options: question.options,
+  //     });
+  //   }
+  // };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      updateResearch(project.id, { status: "in-progress" });
+      updateResearch(project.id, { status: "in-progress", content: "" });
       setCurrentStatus("in-progress");
+      clearEventLog(project.id);
 
       const result = await graph.invoke(
         {
@@ -127,12 +96,14 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
       });
       await Promise.all([
         handleGenerateFlashCards(result.finalReport),
-        handleGenerateQuiz(result.finalReport),
+        // handleGenerateQuiz(result.finalReport),
       ]);
       setCurrentStatus("completed");
       window.location.reload();
     } catch (error) {
       console.error("Error generating research:", error);
+      updateResearch(project.id, { status: "failed" });
+      setCurrentStatus("failed");
     } finally {
       setIsGenerating(false);
     }
@@ -141,7 +112,7 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
   const handleReset = () => {
     updateResearch(project.id, { status: "pending", content: "" });
     clearEventLog(project.id);
-    window.location.reload();
+    setCurrentStatus("pending");
   };
 
   return (
@@ -150,12 +121,7 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
         <div>
           <div className="mb-2 flex items-center gap-3">
             <h1 className="text-2xl font-bold capitalize">{project.topic}</h1>
-            <Badge variant="outline" className={statusColors[currentStatus]}>
-              <span className="flex items-center gap-1">
-                {statusIcons[currentStatus]}
-                {statusText[currentStatus]}
-              </span>
-            </Badge>
+            <StatusBadge status={project.status} />
           </div>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -168,13 +134,17 @@ export function ResearchHeader({ project }: ResearchHeaderProps) {
             <Share2 className="mr-2 h-4 w-4" />
             Share
           </Button> */}
-          <Button variant="outline" size="sm" onClick={handleDownload}>
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleReset}>
-            Reset
-          </Button>
+          {project.content && (
+            <>
+              <Button variant="outline" size="sm" onClick={handleDownload}>
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleReset}>
+                Reset
+              </Button>
+            </>
+          )}
           <Button
             size="sm"
             onClick={handleGenerate}

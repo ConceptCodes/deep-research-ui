@@ -2,13 +2,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 
-export const FlashCard = ({
-  question,
-  answer,
-}: {
+type FlashCardProps = {
   question: string;
   answer: string;
-}) => {
+};
+
+export const FlashCard = ({ question, answer }: FlashCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const handleToggle = () => setIsFlipped((prev) => !prev);
@@ -45,8 +44,8 @@ export const FlashCard = ({
         variants={variants}
         transition={transition}
       >
-        {/* Front Face */}
         <motion.div
+          id="front"
           style={{
             position: "absolute",
             width: "100%",
@@ -65,8 +64,8 @@ export const FlashCard = ({
           </Card>
         </motion.div>
 
-        {/* Back Face */}
         <motion.div
+          id="back"
           style={{
             position: "absolute",
             width: "100%",

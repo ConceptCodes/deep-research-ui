@@ -78,7 +78,7 @@ export function formatAgentStep(step: AgentStep): Event {
 export const getLLM = (apiKey: string, model: string) => {
   return new ChatOpenAI({
     modelName: model,
-    temperature: 0,
+    ...(["o3-mini"].includes(model) ? { temperature: 0.7 } : {}),
     openAIApiKey: apiKey,
   });
 };

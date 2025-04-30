@@ -31,6 +31,7 @@ export type Question = {
   type: QuestionType;
   answer: string | null;
   submission: string | null;
+  options: string[] | null;
   updatedAt: string | null;
 };
 
